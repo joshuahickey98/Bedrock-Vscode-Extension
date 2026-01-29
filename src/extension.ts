@@ -77,7 +77,24 @@ export function activate(context: vscode.ExtensionContext) {
                     panel.webview.postMessage({ command: 'endResponse' });
 
                 } catch (err: any) {
-                    const errorMsg = `Error: ${err.message || String(err)}`;
+                    // Sanitize error message to avoid exposing sensitive information
+                    let errorMsg = 'Unable to connect to AWS Bedrock. ';
+                    
+                    if (err.name === 'CredentialsProviderError' || err.message?.includes('credentials')) {
+                        errorMsg += 'Please ensure your AWS credentials are configured correctly. ' +
+                                   'You can configure credentials via AWS CLI (aws configure), ' +
+                                   'environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY), ' +
+                                   'or ~/.aws/credentials file.';
+                    } else if (err.name === 'AccessDeniedException' || err.message?.includes('AccessDenied')) {
+                        errorMsg += 'Access denied. Please ensure you have Bedrock access enabled in your AWS account ' +
+                                   'and the selected model is available in your region.';
+                    } else if (err.$metadata?.httpStatusCode === 404) {
+                        errorMsg += 'Model not found. Please check your model ID in the extension settings.';
+                    } else {
+                        // Generic error without exposing internal details
+                        errorMsg += `${err.message || 'An unexpected error occurred'}`;
+                    }
+                    
                     panel.webview.postMessage({ 
                         command: 'error', 
                         text: errorMsg 
@@ -85,6 +102,7 @@ export function activate(context: vscode.ExtensionContext) {
                     console.error('Bedrock API Error:', err);
                 }
             } else if (message.command === 'clearChat') {
+                // Clear conversation history to start a new conversation
                 conversationHistory.length = 0;
             } else if (message.command === 'insertCode') {
                 const editor = vscode.window.activeTextEditor;
