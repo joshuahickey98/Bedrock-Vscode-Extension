@@ -17,9 +17,29 @@
     "commands": [
       {
         "command": "bedrock.start",
-        "title": "Bedrock Anthropic Chat"
+        "title": "AWS Bedrock Chat"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "AWS Bedrock",
+      "properties": {
+        "bedrock.region": {
+          "type": "string",
+          "default": "us-east-1",
+          "description": "AWS region for Bedrock API"
+        },
+        "bedrock.modelId": {
+          "type": "string",
+          "default": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+          "description": "Bedrock model ID to use"
+        },
+        "bedrock.maxTokens": {
+          "type": "number",
+          "default": 4096,
+          "description": "Maximum tokens for response"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -39,5 +59,8 @@
     "typescript": "^5.9.2",
     "@vscode/test-cli": "^0.0.11",
     "@vscode/test-electron": "^2.5.2"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.705.0"
   }
 }

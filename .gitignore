@@ -1,0 +1,9 @@
+node_modules
+out
+.vscode-test
+*.vsix
+.DS_Store
+*.log
+extension.js
+extension.js.map
+package-lock.json
